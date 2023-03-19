@@ -8,6 +8,8 @@
 import React from 'react';
 import type {PropsWithChildren} from 'react';
 import {
+  Dimensions, Image,
+  ImageBackground,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -32,21 +34,83 @@ type SectionProps = PropsWithChildren<{
 function Section({children, title}: SectionProps): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
   return (
-      <Text style={styles.sectionTitle}>{title}</Text>
+      <Text style={{
+        color: isDarkMode ? Colors.white : Colors.black,
+        fontSize: 24,
+        zIndex: 1,
+      }}>{title}</Text>
 
   );
 }
 
 function App(): JSX.Element {
+
+  const [marginTop, setMarginTop] = React.useState(Dimensions.get('window').height / 2 - 50)
+
   const isDarkMode = useColorScheme() === 'dark';
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      setMarginTop((prevMarginTop) => prevMarginTop + 2.5 < Dimensions.get('window').height ? prevMarginTop + 2.5 : Dimensions.get('window').height / 2 - 50);
+    }, 10);
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <Section title={'Hello birds'}/>
+    <SafeAreaView style={backgroundStyle} onTouchEnd={
+        () => {
+          setMarginTop(marginTop - 70)
+        }
+    }>
+
+      <View style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        width: Dimensions.get('window').width,
+        height: Dimensions.get('window').height,
+
+
+      }}>
+        <ImageBackground source={require('./assets/img/sky.png')} style={{
+          width: Dimensions.get('window').width,
+          height: Dimensions.get('window').height,
+          position: 'absolute',
+          zIndex: 0,
+        }}/>
+        <Section title={'Hello birds'}/>
+
+        <Image source={require('./assets/img/bird.png')} style={{
+          width: 150,
+          height: 100,
+          position: "absolute",
+          top: marginTop,
+        }}/>
+
+          <Image source={require('./assets/img/pipeTop.png')} style={{
+            width: 80,
+            height: 500,
+            position: "absolute",
+            left: 300,
+
+            top: -250,
+          }}/>
+          <Image source={require('./assets/img/pipeTop.png')} style={{
+            width: 80,
+            height: 500,
+            position: "absolute",
+            left: 300,
+            bottom: -250,
+            transform: [{rotate: '180deg'}],
+          }}/>
+
+
+      </View>
+
     </SafeAreaView>
   );
 }
